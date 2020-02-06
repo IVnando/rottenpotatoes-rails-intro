@@ -4,9 +4,12 @@
 %table#movies.table.table-striped.col-md-12
   %thead
     %tr
-      %th Movie Title
+      -# Self note 1: {:class, :id} used to hilight, = link_to ... used for sorting
+      -# Self note 2: careful with spacing, will not work properly if space between 
+      -#              } and = as well as th and {
+      %th{:class => @title_header, :id => "title_header"}= link_to "Movie Title", :sort => "title"
       %th Rating
-      %th Release Date
+      %th{:class => @release_header, :id => "release_header"}= link_to "Release Date", :sort => "release_date"
       %th More Info
   %tbody
     - @movies.each do |movie|

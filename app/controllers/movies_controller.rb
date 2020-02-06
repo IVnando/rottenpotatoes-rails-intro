@@ -11,7 +11,16 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @movies = Movie.all.order params[:sort]
+    
+    # Self note 1: if elsif used to change background color of column header
+    # Self note 2: apparently does not matter if title, hilite, and release_date
+    #              are in single or double quotes
+    if params[:sort] == "title"
+      @title_header = "hilite"
+    elsif params[:sort] == "release_date"
+      @release_header = "hilite"
+    end
   end
 
   def new
