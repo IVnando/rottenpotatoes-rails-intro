@@ -1,15 +1,24 @@
 -#  This file is app/views/movies/index.html.haml
 %h2 All Movies
-
+= form_tag movies_path, :id => 'ratings_form', :method => :get do
+  Include:
+  - @all_ratings.each do |rating|
+    = rating
+    = check_box_tag "ratings[#{rating}]", rating, if params[:ratings] then @set_ratings.include?(rating) else true end, :id => "ratings_#{rating}"
+  = submit_tag 'Refresh', :id => 'ratings_submit'
+  
 %table#movies.table.table-striped.col-md-12
   %thead
     %tr
       -# Self note 1: {:class, :id} used to hilight, = link_to ... used for sorting
       -# Self note 2: careful with spacing, will not work properly if space between 
       -#              } and = as well as th and {
-      %th{:class => @title_header, :id => "title_header"}= link_to "Movie Title", :sort => "title"
+      -# Self note 3: set_ratings here takes the ratings from the previous time the
+      -#              user restricted the database and allows it to be sortable 
+      -#              without resetting it
+      %th{:class => @title_header, :id => "title_header"}= link_to "Movie Title", :sort => "title", :ratings => @set_ratings
       %th Rating
-      %th{:class => @release_header, :id => "release_header"}= link_to "Release Date", :sort => "release_date"
+      %th{:class => @release_header, :id => "release_header"}= link_to "Release Date", :sort => "release_date", :ratings => @set_ratings
       %th More Info
   %tbody
     - @movies.each do |movie|

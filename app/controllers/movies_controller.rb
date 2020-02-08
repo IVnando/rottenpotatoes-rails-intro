@@ -11,7 +11,6 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all.order params[:sort]
     
     # Self note 1: if elsif used to change background color of column header
     # Self note 2: apparently does not matter if title, hilite, and release_date
@@ -20,6 +19,19 @@ class MoviesController < ApplicationController
       @title_header = "hilite"
     elsif params[:sort] == "release_date"
       @release_header = "hilite"
+    end
+    
+    @all_ratings = Movie.all_ratings.keys
+    @set_ratings = params[:ratings]
+    
+    # Self note 3: params[:something] returns nil or false if undefined
+    # Self note 4: process of getting ratings moved into Movie model, but has 
+    #              to sort when returned
+    if params[:ratings]
+      @movies = Movie.with_ratings(params[:ratings].keys).order params[:sort]
+    else
+      @movies = Movie.all.order params[:sort]
+      @set_ratings = Hash.new
     end
   end
 
@@ -50,5 +62,4 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-
 end
