@@ -12,26 +12,46 @@ class MoviesController < ApplicationController
 
   def index
     
+    # Self note: one thing to consider for the sessions is to have one session hash
+    #            rather than two session arrays
+    if params[:sort]
+      @sort_by = params[:sort]
+      session[:sort] = params[:sort]
+    elsif session[:sort]
+      @sort_by = session[:sort]
+    else
+      @sort_by = nil
+    end
+    
+    if params[:ratings]
+      @set_ratings = params[:ratings]
+      session[:ratings] = params[:ratings]
+    elsif params[:commit] == "Refresh" and !params[:ratings]
+      @set_ratings = session[:ratings]
+    elsif session[:ratings]
+      @set_ratings = session[:ratings]
+    else
+      @set_ratings = Hash.new
+    end
+    
     # Self note 1: if elsif used to change background color of column header
     # Self note 2: apparently does not matter if title, hilite, and release_date
     #              are in single or double quotes
-    if params[:sort] == "title"
+    if @sort_by == "title"
       @title_header = "hilite"
-    elsif params[:sort] == "release_date"
+    elsif @sort_by == "release_date"
       @release_header = "hilite"
     end
     
     @all_ratings = Movie.all_ratings.keys
-    @set_ratings = params[:ratings]
     
     # Self note 3: params[:something] returns nil or false if undefined
     # Self note 4: process of getting ratings moved into Movie model, but has 
     #              to sort when returned
-    if params[:ratings]
-      @movies = Movie.with_ratings(params[:ratings].keys).order params[:sort]
+    if @set_ratings
+      @movies = Movie.with_ratings(@set_ratings.keys).order @sort_by
     else
-      @movies = Movie.all.order params[:sort]
-      @set_ratings = Hash.new
+      @movies = Movie.all.order @sort_by
     end
   end
 
